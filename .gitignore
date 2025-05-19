@@ -1,0 +1,6 @@
+store/__pycache__
+store/templatetags/__pycache__
+electronic-store/__pycache__
+store/migrations/__pycache__
+venv
+db.sqlite3
