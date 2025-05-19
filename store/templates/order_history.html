@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Order History{% endblock %}
+
+{% block content %}
+<h2>Your Order History</h2>
+{% for order in orders %}
+  <div class="mb-4 p-3 border rounded">
+    <h5>Order #{{ order.custom_order_id|default:order.id }} — {{ order.created_at|date:"M d, Y" }}</h5>
+    <ul class="list-unstyled">
+      {% for item in order.items.all %}
+        <li>{{ item.quantity }} × {{ item.product.name }} — ${{ item.get_total_price }}</li>
+      {% endfor %}
+    </ul>
+    <p class="fw-bold">Total: ${{ order.total_price }}</p>
+  </div>
+{% empty %}
+  <p>You have no past orders.</p>
+{% endfor %}
+{% endblock %}

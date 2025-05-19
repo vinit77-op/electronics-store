@@ -1,0 +1,369 @@
+{% extends 'base.html' %}
+{% load static extras %}
+{% block title %}{{ product.name }}{% endblock %}
+{% block content %}
+
+<div class="container py-2">
+  <!-- Product info row: image + details -->
+  <div class="row gx-2 gy-3 align-items-start">
+    <h1>Product Details</h1>
+
+    <!-- Product Image -->
+    <div class="col-12 col-md-6 d-flex justify-content-center">
+      {% if product.image %}
+      <img
+        src="{{ product.image.url }}"
+        class="img-fluid rounded shadow-sm"
+        alt="{{ product.name }}"
+        style="max-height: 450px; width: 100%; object-fit: contain"
+        loading="lazy"
+        decoding="async"
+      />
+      {% else %}
+      <img
+        src="{% static 'images/no-image.png' %}"
+        class="img-fluid rounded shadow-sm"
+        alt="No image available"
+        style="max-height: 450px; width: 100%; object-fit: contain"
+        loading="lazy"
+        decoding="async"
+      />
+      {% endif %}
+    </div>
+
+    <!-- In your product card (home.html or product_detail.html) -->
+      {% if product.stock > 0 %}
+      <p class="text-success fw-semibold">In Stock: {{ product.stock }}</p>
+      {% else %}
+      <p class="text-danger fw-semibold">Out of Stock</p>
+      {% endif %}
+
+    <!-- Product Details -->
+    <article class="col-12 col-md-6 d-flex flex-column">
+      <h1 class="mb-3">{{ product.name }}</h1>
+      <p class="text-muted"><small>Category: {{ product.category }}</small></p>
+
+      <section>
+        <h2 class="visually-hidden">Product Description</h2>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+      </section>
+
+      <!-- ✅ Fixed Pricing Section -->
+      <section aria-label="Pricing information" class="mb-3">
+        {% if product.discount_percentage > 0 %}
+        <h3 class="fw-bold text-danger d-flex align-items-center gap-2 flex-wrap">
+          ${{ product.discounted_price }}
+          <span class="fs-6 text-muted text-decoration-line-through">
+            ${{ product.price }}
+          </span>
+          <span class="badge bg-danger rounded-pill" aria-label="Discount percentage">
+            {{ product.discount_percentage }}% off
+          </span>
+        </h3>
+        <p class="text-muted small fst-italic">Limited-time offer</p>
+
+        {% if product.discount_end_time and product.discount_end_time > current_time %}
+        <div
+          id="discount-countdown"
+          class="fw-semibold text-danger"
+          aria-live="polite"
+          aria-atomic="true"
+          role="timer"
+          tabindex="0"
+          aria-label="Discount time remaining"
+        >
+          Time left: <span id="time-left">Loading...</span>
+        </div>
+        {% endif %}
+        {% else %}
+        <h3 class="text-success fw-bold mb-3">${{ product.price }}</h3>
+        {% endif %}
+      </section>
+
+      <!-- Average Rating -->
+      {% if avg_rating %}
+      <section aria-label="Average customer rating" class="mt-2 mb-4">
+        <strong>Average Rating:</strong>
+        <span class="text-warning fs-5 rating-stars" aria-hidden="true">
+          {% for i in 1|make_range:6 %}
+            {% if i <= avg_rating|floatformat:0 %}
+              <i class="bi bi-star-fill glow-star"></i>
+            {% else %}
+              <i class="bi bi-star"></i>
+            {% endif %}
+          {% endfor %}
+        </span>
+        <small class="text-muted">({{ avg_rating|floatformat:1 }}/5)</small>
+      </section>
+      {% endif %}
+
+      <!-- Add to Cart -->
+      <form id="add-to-cart-form" action="{% url 'add_to_cart' product.id %}" method="post" class="mt-auto d-flex flex-column gap-3" aria-label="Add product to cart" data-url="{% url 'add_to_cart' product.id %}">  
+        <div id="add-to-cart-msg" class="text-success fw-semibold" aria-live="polite" aria-atomic="true" role="status"> Cart Items: {{ product.cart_quantity }} </div>
+        {% csrf_token %}
+      <div class="d-flex flex-row gap-1">
+        <button
+          type="submit"
+          class="btn btn-primary flex-grow-1 flex-sm-grow-0 fs-6 py-3"
+          aria-label="Add {{ product.name }} to cart"
+          id="add-to-cart-btn"
+          {% if product.stock == 0 %}disabled{% endif %}
+        >
+          <i class="bi bi-cart-plus-fill me-2"></i> Add to Cart
+        </button>
+        <a
+          href="{% url 'view_cart' %}"
+          class="btn btn-success flex-grow-1 flex-sm-grow-0 fs-6 py-3"
+          aria-label="View cart items"
+        >
+          <i class="bi bi-cart-fill me-2"></i> View Cart Items
+        </a>
+      </div>
+      </form>
+    </article>
+  </div>
+
+  <!-- Reviews Section -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <section aria-labelledby="reviews-heading">
+        <h2 id="reviews-heading" class="mb-3 fs-4 fw-semibold">Customer Reviews</h2>
+
+        {% if user.is_authenticated %}
+        <div class="mb-4">
+          {% if existing_review %}
+          <p class="text-muted">You already reviewed this product. You can update it below:</p>
+          {% endif %}
+          <form method="post" class="review-form" aria-label="Submit or update your product review">
+            {% csrf_token %}
+
+            <!-- Star Rating -->
+            <fieldset class="mb-2">
+              <legend id="rating-label" class="form-label">Rating:</legend>
+              <div class="d-flex gap-1 rating-stars text-warning fs-4" role="radiogroup" aria-labelledby="rating-label">
+                {% for i in 1|make_range:6 %}
+                <label style="cursor: pointer" aria-label="{{ i }} star{% if i > 1 %}s{% endif %}" tabindex="0" onkeydown="if(event.key==='Enter' || event.key===' ') { this.querySelector('input').click(); event.preventDefault(); }">
+                  <input type="radio" name="rating" value="{{ i }}" class="d-none" {% if existing_review and existing_review.rating == i %}checked{% endif %} required />
+                  <i class="bi {% if existing_review and i <= existing_review.rating %}bi-star-fill glow-star{% else %}bi-star{% endif %}"></i>
+                </label>
+                {% endfor %}
+              </div>
+            </fieldset>
+
+            <!-- Comment -->
+            <label for="comment" class="form-label">Comment:</label>
+            <textarea name="comment" id="comment" rows="3" class="form-control mb-2" placeholder="Write your review..." required aria-required="true">{% if existing_review %}{{ existing_review.comment }}{% endif %}</textarea>
+
+            <button type="submit" class="btn btn-outline-primary" aria-label="{% if existing_review %}Update{% else %}Submit{% endif %} review">
+              {% if existing_review %}Update Review{% else %}Submit Review{% endif %}
+            </button>
+          </form>
+        </div>
+        {% else %}
+        <p class="fs-6">
+          <a href="{% url 'login' %}?next={{ request.path }}">Login</a> to leave a review.
+        </p>
+        {% endif %}
+
+        <!-- List of Reviews -->
+        <div>
+          {% for review in reviews %}
+          <article class="border-bottom pb-3 mb-3" aria-label="Review by {{ review.user.username }}">
+            <strong>{{ review.user.username }}</strong><br />
+            <span class="text-warning" aria-hidden="true">
+              {% for i in 1|make_range:6 %}
+              {% if i <= review.rating %}
+              <i class="bi bi-star-fill glow-star"></i>
+              {% else %}
+              <i class="bi bi-star"></i>
+              {% endif %}
+              {% endfor %}
+            </span>
+            <p class="mb-0 mt-1">{{ review.comment }}</p>
+            <small class="text-muted">{{ review.created_at|date:"Y-m-d H:i" }}</small>
+          </article>
+          {% empty %}
+          <p class="text-muted fs-6">No reviews yet. Be the first to review this product!</p>
+          {% endfor %}
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- CSS Styling -->
+<style>
+  :root {
+    --primary-color: #0d6efd;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --text-muted: #6c757d;
+  }
+
+  .glow-star {
+    filter: drop-shadow(0 0 2px var(--warning-color));
+  }
+
+  .rating-stars i {
+    transition: transform 0.2s ease, color 0.3s ease;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .rating-stars i:hover,
+  .rating-stars label:focus-visible i {
+    transform: scale(1.3);
+    color: var(--primary-color);
+  }
+
+  .badge.bg-danger {
+    font-size: 0.75rem;
+    padding: 0.35em 0.6em;
+  }
+
+  @media (max-width: 575.98px) {
+    .rating-stars i:hover,
+    .rating-stars label:focus-visible i {
+      transform: none;
+      color: var(--warning-color);
+    }
+  }
+
+  #discount-countdown {
+    font-size: 1rem;
+    margin-top: 0.25rem;
+  }
+
+  button.btn-primary:hover,
+  button.btn-primary:focus {
+    background-color: #0046d5;
+    border-color: #0046d5;
+    box-shadow: 0 0 8px rgba(0, 70, 213, 0.6);
+    outline-offset: 2px;
+  }
+
+  button.btn-outline-primary:hover,
+  button.btn-outline-primary:focus {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 8px rgba(13, 110, 253, 0.6);
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 575.98px) {
+    form[aria-label="Add product to cart"] button {
+      font-size: 1rem;
+      padding: 1rem;
+    }
+  }
+</style>
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+
+<!-- JavaScript for Rating & Countdown -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const ratingLabels = document.querySelectorAll(".review-form .rating-stars label");
+    ratingLabels.forEach((label) => {
+      label.addEventListener("click", () => {
+        const value = Number(label.querySelector("input").value);
+        ratingLabels.forEach((lbl, index) => {
+          const icon = lbl.querySelector("i");
+          if (index < value) {
+            icon.classList.add("bi-star-fill", "glow-star");
+            icon.classList.remove("bi-star");
+          } else {
+            icon.classList.remove("bi-star-fill", "glow-star");
+            icon.classList.add("bi-star");
+          }
+        });
+      });
+    });
+
+    ratingLabels.forEach((label) => {
+      label.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowRight" || e.key === "ArrowUp") {
+          e.preventDefault();
+          const next = label.nextElementSibling || ratingLabels[0];
+          next.focus();
+        }
+        if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
+          e.preventDefault();
+          const prev = label.previousElementSibling || ratingLabels[ratingLabels.length - 1];
+          prev.focus();
+        }
+      });
+    });
+
+    const discountCountdown = document.getElementById("discount-countdown");
+    if (discountCountdown) {
+      const endTime = new Date("{{ product.discount_end_time|date:'c' }}").getTime();
+      const timerInterval = setInterval(() => {
+        const now = new Date().getTime();
+        const distance = endTime - now;
+
+        if (distance < 0) {
+          discountCountdown.textContent = "Expired";
+          clearInterval(timerInterval);
+          return;
+        }
+
+        discountCountdown.textContent = formatTime(distance);
+      }, 1000);
+    }
+
+    function formatTime(distance) {
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      let timeString = "";
+      if (days > 0) {
+        timeString += days + " day" + (days > 1 ? "s " : " ");
+      }
+      timeString +=
+        (hours < 10 ? "0" + hours : hours) +
+        ":" +
+        (minutes < 10 ? "0" + minutes : minutes) +
+        ":" +
+        (seconds < 10 ? "0" + seconds : seconds);
+
+      return timeString;
+    }
+
+    const addToCartForm = document.getElementById("add-to-cart-form");
+    const addToCartBtn = document.getElementById("add-to-cart-btn");
+    const msgDiv = document.getElementById("add-to-cart-msg");
+
+    if (addToCartForm && addToCartBtn) {
+      addToCartForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const url = addToCartForm.dataset.url;
+        const csrftoken = addToCartForm.querySelector("[name=csrfmiddlewaretoken]").value;
+
+        fetch(url, {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": csrftoken,
+            "X-Requested-With": "XMLHttpRequest",
+          },
+        })
+        .then(response => response.json())
+        .then((data) => {
+          if (data.status === "success") {
+            msgDiv.textContent = `Cart Items: (Quantity: ${data.cart_quantity})`;
+            msgDiv.classList.remove("visually-hidden");
+          }
+        })
+        .catch((error) => {
+          console.error("Error adding to cart:", error);
+        });
+      });
+    }
+  });
+</script>
+{% endblock %}

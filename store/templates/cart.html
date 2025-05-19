@@ -1,0 +1,102 @@
+{% extends 'base.html' %} {% block title %}Your Cart{% endblock %} 
+{% block content %}
+<div class="container-fluid py-2">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-10 col-lg-8">
+      <h2 class="text-center mb-4">Your Cart</h2>
+
+      {% if cart_items %}
+      <form method="post" id="cart-form" class="mb-4">
+        {% csrf_token %}
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle text-center">
+            <thead class="table-light">
+              <tr>
+                <th scope="col">Product</th>
+                <th scope="col">Price</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Total</th>
+                <th scope="col">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in cart_items %}
+              <tr>
+                <td>{{ item.product.name }}</td>
+                <td>${{ item.product.price }}</td>
+                <td>
+                  <input
+                    type="number"
+                    name="quantity_{{ item.id }}"
+                    value="{{ item.quantity }}"
+                    min="1"
+                    class="form-control text-center quantity-input"
+                    style="width: 80px; margin: auto"
+                  />
+                </td>
+                <td>${{ item.get_total_price }}</td>
+                <td>
+                  <a
+                    href="{% url 'remove_from_cart' item.id %}"
+                    class="btn btn-outline-danger btn-sm"
+                  >
+                    <i class="bi bi-trash-fill"></i> Remove
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Responsive Button Group -->
+        <div class="row g-2 mt-4">
+          <div class="col-12 col-md-4 d-grid">
+            <button type="submit" class="btn btn-primary btn-lg">
+              <i class="bi bi-arrow-repeat me-1"></i> Update Cart
+            </button>
+          </div>
+          <div class="col-12 col-md-4 d-grid">
+            <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-lg">
+              <i class="bi bi-store me-1"></i> Continue storeping
+            </a>
+          </div>
+          <div class="col-12 col-md-4 d-grid">
+            <a href="{% url 'checkout' %}" class="btn btn-success btn-lg">
+              <i class="bi bi-check2-circle me-1"></i> Checkout
+            </a>
+          </div>
+        </div>
+      </form>
+
+      <!-- Auto-submit on quantity change -->
+      <script>
+        const quantityInputs = document.querySelectorAll(".quantity-input");
+        const form = document.getElementById("cart-form");
+
+        quantityInputs.forEach((input) => {
+          input.addEventListener("change", () => {
+            form.submit();
+          });
+        });
+
+        // Prevent cart back button issue (optional)
+        window.addEventListener("popstate", function (event) {
+          event.preventDefault();
+          window.history.replaceState({}, "", "/");
+        });
+      </script>
+
+      {% else %}
+      <p class="text-center text-muted fs-5">Your cart is empty.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap Icons (ensure this is in your base.html if not already) -->
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+/>
+{% endblock %}

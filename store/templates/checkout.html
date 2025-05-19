@@ -1,0 +1,43 @@
+{% extends 'base.html' %} {% block title %}Checkout{% endblock %} 
+{% block content %}
+<div class="container py-4">
+  <h2>Checkout</h2>
+
+  {% if cart_items %}
+  <form method="post">
+    {% csrf_token %}
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">Product</th>
+            <th scope="col">Qty</th>
+            <th scope="col">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in cart_items %}
+          <tr>
+            <td>{{ item.product.name }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>${{ item.get_total_price }}</td>
+          </tr>
+          {% endfor %}
+          <tr>
+            <td colspan="2" class="text-end"><strong>Total:</strong></td>
+            <td><strong>${{ total }}</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <button type="submit" class="btn btn-success">Place Order</button>
+  </form>
+  {% else %}
+  <div class="alert alert-info" role="alert">
+    Your cart is empty.
+    <a href="{% url 'home' %}" class="alert-link">Browse products</a> to start
+    storeping.
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

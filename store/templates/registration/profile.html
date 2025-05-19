@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="container p-2 py-2">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-xs-xs rounded-4">
+        <div class="card-body p-4">
+          <h3 class="mb-4 fw-bold text-center">Your Profile</h3>
+
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <strong>Username:</strong> {{ request.user.username }}
+            </li>
+            <li class="list-group-item">
+              <strong>First Name:</strong> {{ request.user.first_name }}
+            </li>
+            <li class="list-group-item">
+              <strong>Last Name:</strong> {{ request.user.last_name }}
+            </li>
+            <li class="list-group-item">
+              <strong>Email:</strong> {{ request.user.email }}
+            </li>
+          </ul>
+
+          <div class="mt-4 d-flex justify-content-between">
+            <a href="{% url 'password-change' %}" class="btn btn-outline-primary">
+              Change Password
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
