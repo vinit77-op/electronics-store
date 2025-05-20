@@ -1,4 +1,5 @@
 <p align="center">
+  <img src="store/static/assets/electronics-icon.png" height="128">
   <h2 align="center"><a> electronics store </a></h2>
   <p align="center">Electronic store based on django framework <p>
 </p>
